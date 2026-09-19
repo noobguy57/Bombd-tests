@@ -1884,9 +1884,30 @@ public class SimServer
                                     BroadcastPlayerState();
                                     SetCurrentGameroomState(RoomState.None);
                                 
-                                    // Reset back to the first series race
-                                    if (_seriesInfo != null && _raceSettings != null)
+                                    if (IsRanked && _raceSettings != null)
+                                    {
+                                        // Ranked rooms get a new random event (or series) for the next race,
+                                        // the same way the veto handler picks a replacement
+                                        EventSettings nextSettings;
+                                        if (_seriesInfo != null)
+                                        {
+                                            var series = Career.ModNation.GetRankedSeries(5, Owner);
+                                            _seriesInfo.Value = series;
+                                            nextSettings = series.Events.First();
+                                        }
+                                        else
+                                        {
+                                            nextSettings = Career.ModNation.GetRankedEvent(Owner, _raceSettings.Value.CreationId);
+                                        }
+
+                                        TriggerRaceEventSync(EventUpdateReason.RaceSettingsChanged, nextSettings);
+                                        Room.UpdateAttributes(nextSettings);
+                                    }
+                                    else if (_seriesInfo != null && _raceSettings != null)
+                                    {
+                                        // Unranked series (e.g. top tracks) replay from the first event
                                         _raceSettings.Value = _seriesInfo.Value.Events[0];
+                                    }
                                     
                                     // Reset the voting package
                                     if (IsKarting && Type == ServerType.Competitive)
