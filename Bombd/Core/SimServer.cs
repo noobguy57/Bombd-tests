@@ -1811,10 +1811,11 @@ public class SimServer
                                     _raceSettings.Value = nextEvent;
                                     Room.UpdateAttributes(nextEvent);
                                     _destination = Destination.NextSeriesRace;
-                                } else _destination = IsRanked ? Destination.KartPark : Destination.GameRoom;
+                                } 
                             }
-                            // Single xp races in ModNation just return back to the kart park
-                            else if (IsRanked) _destination = Destination.KartPark;
+                            // Single xp races here were errouneously returned to the KartPark, those lines have been removed
+                            // since standard behavior is return to the GameRoom
+                            
                             Logger.LogDebug<SimServer>($"{Room.Game.GameName} race has been completed, destination is {_destination}");
                             
                             int postRaceDelay = _raceConstants.PostRaceTime;
