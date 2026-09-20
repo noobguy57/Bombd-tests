@@ -1247,6 +1247,13 @@ public class SimServer
                 // }
                 
                 _eventResults.AddRange(results);
+                // Cache our own score so series standings can be calculated
+                foreach (var result in results)
+                {
+                    if (result.OwnerUid != player.State.NameUid) continue;
+                    player.HasFinishedRace = result.PercentComplete >= 1.0f;
+                    player.Score = result.EventScore;
+                }
                 player.HasSentRaceResults = true;
                 
                 break;
@@ -1666,7 +1673,10 @@ public class SimServer
 
     private string FinalizeSeriesResults()
     {
-        var racers = _players.Where(p => !p.IsSpectator).OrderBy(p => p.Score).ToList();
+        var racers = _players.Where(p => !p.IsSpectator)
+        .OrderBy(p => p.HasFinishedRace ? 0 : 1)
+        .ThenBy(p => p.Score)
+        .ToList();
         for (int i = 0; i < racers.Count; ++i)
         {
             racers[i].Points = RaceConstants.SeriesPoints[i];
