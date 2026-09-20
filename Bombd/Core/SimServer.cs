@@ -1954,6 +1954,9 @@ public class SimServer
                                     break;
                                 case Destination.NextSeriesRace:
                                     Logger.LogDebug<SimServer>($"Starting next series event!");
+                                    // Re-roll the starting grid for every race in the series
+                                    _gridOrder.Clear();
+                                    UpdateRaceSetup();
                                     StartEvent();
                                     break;
                             }
