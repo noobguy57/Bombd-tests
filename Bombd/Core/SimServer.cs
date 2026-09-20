@@ -50,6 +50,8 @@ public class SimServer
     private int _raceStateEndTime;
     private float _pausedTimeRemaining;
     private string _destination = Destination.GameRoom;
+
+    private readonly Dictionary<int, int> _gridOrder = new();
     
     private GenericSyncObject<CoiInfo>? _coiInfo;
     private GenericSyncObject<VotePackage> _votePackage;
@@ -443,6 +445,10 @@ public class SimServer
             }
             case RoomState.CountingDown:
             {
+                // This just makes sure we re-roll the grid positions unless the count down gets paused
+                if (oldState != RoomState.CountingDownPaused)
+                _gridOrder.Clear();
+
                 UpdateRaceSetup();
                 
                 room.LoadEventTime = TimeHelper.LocalTime + _raceConstants.GameRoomCountdownTime;
@@ -495,17 +501,31 @@ public class SimServer
         return syncObject;
     }
 
+    private int GetGridOrder(int userId)
+    {
+    if (!_gridOrder.TryGetValue(userId, out int order))
+    {
+        order = Random.Shared.Next();
+        _gridOrder[userId] = order;
+    }
+    
+    return order;
+    }
+
     private void UpdateRaceSetup()
     {
         if (_raceSettings == null || Type != ServerType.Competitive || _players.Count == 0) return;
 
         _startingGrid.Value.Clear();
-        foreach (GamePlayer player in _players)
+        var racers = _players
+        .Where(player => player.State.HasNameUid)
+        .OrderBy(player => GetGridOrder(player.UserId));
+
+        foreach (GamePlayer player in racers)
         {
-            if (!player.State.HasNameUid) continue;
             _startingGrid.Value.Add(new GridPositionData(player.State.NameUid, false));
             if (player.Guest != null)
-                _startingGrid.Value.Add(new GridPositionData(player.Guest.NameUid, true));
+            _startingGrid.Value.Add(new GridPositionData(player.Guest.NameUid, true));
         }
 
         int maxAi = _aiInfo.Value.DataSet.Length;
