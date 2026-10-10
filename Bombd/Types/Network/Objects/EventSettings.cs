@@ -104,7 +104,8 @@ public class EventSettings : INetworkReadable, INetworkWritable
             UpdateReason = (EventUpdateReason)reader.ReadInt32();
             KartParkHome = reader.ReadString(0x40);
             TranslatedTrackName = reader.ReadString(0x40);
-            NisName = reader.ReadString(0x40); // intro (NIS) name
+            NisName = reader.ReadString(0x38); // intro (NIS) name
+            reader.Offset += 8;                // always set by the server below
             
             return;
         }
@@ -149,7 +150,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
             writer.Write(Private ? 1 : 0); // 0x6v
             writer.Write(CareerEventIndex); // 0x70
             writer.Write(SeriesEventIndex); // 0x74
-            writer.Write(1); // 0x78 used to be 0
+            writer.Write(0); // 0x78
             writer.Write(MinHumans); // 0x7c
             writer.Write(MaxHumans); // 0x80
             writer.Write(0); // 0x84 - Padding?
@@ -157,8 +158,10 @@ public class EventSettings : INetworkReadable, INetworkWritable
         
             writer.Write(KartParkHome, 0x40); // 0x8c
             writer.Write(TranslatedTrackName, 0x40); // 0xcc
-            Logger.LogInfo<EventSettings>($"Writing NIS '{NisName}' at offset 0x{writer.Offset - start:X}"); // temporary 
-            writer.Write(NisName, 0x40); // 0x10c - intro (NIS) name which the server picks and sends to the clients
+            Logger.LogInfo<EventSettings>($"Writing NIS '{NisName}' at offset 0x{writer.Offset - start:X}, track {CreationId}, reason {UpdateReason}, ranked {IsRanked}");
+            writer.Write(NisName, 0x38); // 0x10c - intro (NIS) name which the server picks and sends to the clients
+            writer.Write(1);             // 0x144 this was always 1 in original server
+            writer.write(0);             // 0x148
 
             return;
         }
