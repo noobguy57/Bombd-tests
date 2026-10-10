@@ -118,7 +118,7 @@ public class SimServer
             {
                 raceSettings = Career.ModNation.GetRankedEvent(Owner);
             }
-            
+            AssignRandomNis(raceSettings); // Call one at the start of room creation
             _raceSettings = CreateSystemSyncObject(raceSettings, NetObjectType.RaceSettings);
             Room.UpdateAttributes(raceSettings);
         }
@@ -780,6 +780,7 @@ public class SimServer
         
         if (newEventSettings != null)
         {
+            AssignRandomNis(newEventSettings);
             newEventSettings.UpdateReason = reason;
             _raceSettings.Value = newEventSettings;
         }
@@ -793,6 +794,17 @@ public class SimServer
         
         _raceSettings.Value.UpdateReason = EventUpdateReason.None;
         _raceSettings.UpdateNoSync();
+    }
+
+    private static readonly string[] OnlineNisNames =
+    {
+        "Generic01", "Generic02", "Generic03", "Generic04", "Generic05", "Generic06", "Generic07",
+        "Generic09", "Generic10", "Generic11", "Generic12", "Generic13", "Generic14", "Generic15"
+    };
+
+    private static void AssignRandomNis(EventSettings settings)
+    {
+        settings.NisName = OnlineNisNames[Random.Shared.Next(OnlineNisNames.Length)];
     }
     
     public void OnNetworkMessage(GamePlayer player, uint senderNameUid, NetMessageType type, ArraySegment<byte> data)
@@ -1478,8 +1490,11 @@ public class SimServer
                 Room.UpdateAttributes(settings);
 
                 if (_raceSettings != null) TriggerRaceEventSync(EventUpdateReason.RaceSettingsChanged, settings);
-                else _raceSettings = CreateSystemSyncObject(settings, NetObjectType.RaceSettings);
-                
+                else 
+                {   
+                    AssignRandomNis(settings);
+                    _raceSettings = CreateSystemSyncObject(settings, NetObjectType.RaceSettings);
+                }
                 break;
             }
             case NetMessageType.VoipPacket:
@@ -2009,6 +2024,12 @@ public class SimServer
                                 case Destination.GameRoom:
                                 {
                                     Logger.LogDebug<SimServer>("Resetting GameRoom state for next race!");
+
+                                    if (_raceSettings != null)
+                                    {
+                                        AssignRandomNis(_raceSettings.Value);
+                                        TriggerRaceEventSync(EventUpdateReason.RaceSettingsChanged);
+                                    }
                                     
                                     // Tell spectators that we're connecting back into the lobby
                                     foreach (var racer in racers)

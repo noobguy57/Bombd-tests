@@ -36,6 +36,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
     // Modnation
     public bool IsRanked;
     public bool AutoReset = true;
+    public string NisName = string.Empty;
     public string TranslatedTrackName = string.Empty;
     public SpeedClass KartSpeed = SpeedClass.Fastest;
     public int NumLaps = 3;
@@ -103,6 +104,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
             UpdateReason = (EventUpdateReason)reader.ReadInt32();
             KartParkHome = reader.ReadString(0x40);
             TranslatedTrackName = reader.ReadString(0x80);
+            NisName = reader.ReadString(0x40); // intro (NIS) name
             
             return;
         }
@@ -153,7 +155,8 @@ public class EventSettings : INetworkReadable, INetworkWritable
             writer.Write((int)UpdateReason); // 0x88
         
             writer.Write(KartParkHome, 0x40); // 0x8c
-            writer.Write(TranslatedTrackName, 0x80); // 0xcc
+            writer.Write(TranslatedTrackName, 0x40); // 0xcc
+            writer.Write(NisName, 0x40); // 0x10c - intro (NIS) name which the server picks and sends to the clients
 
             return;
         }
