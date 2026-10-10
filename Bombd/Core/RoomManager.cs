@@ -254,10 +254,6 @@ public class RoomManager
                 // before advertising the session.
                 if (!room.Simulation.HasRaceSettings)
                     return false;
-
-                // For now just prevent joins into in-progress lobbies entirely, causes instability
-                if (room.Simulation.RaceState >= RaceState.LoadingIntoRace || !room.Simulation.CanJoinAsRacer())
-                    return false;
             }
             
             foreach (KeyValuePair<string, string> attribute in attributes)

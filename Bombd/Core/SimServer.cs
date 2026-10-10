@@ -1862,7 +1862,7 @@ public class SimServer
                 else
                 {
                     // If anybody is still loading past the racer lock, switch them all to spectators
-                    var loadingPlayers = _players.Where(x => (x.State.Flags & PlayerStateFlags.GameRoomReady) == 0).ToList();
+                    var loadingPlayers = _players.Where(x => (x.State.Flags & PlayerStateFlags.GameRoomReady) == 0 || x.State.Away == 1).ToList();
                     if (loadingPlayers.Count != 0 && !CanJoinAsRacer())
                     {
                         foreach (GamePlayer racer in loadingPlayers)
@@ -1896,6 +1896,7 @@ public class SimServer
             }
             case RoomState.RaceInProgress:
             {
+                Logger.LogDebug<SimServer>($"RaceState={RaceState} PlayerStates=[{string.Join(",", _players.Select(x => $"{{Username,{x.Username},IsSpectator={x.IsSpectator},StateFlags={x.State.Flags}}}"))}]");
                 switch (RaceState)
                 {
                     case RaceState.LoadingIntoRace:
