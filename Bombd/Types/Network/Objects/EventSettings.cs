@@ -131,7 +131,8 @@ public class EventSettings : INetworkReadable, INetworkWritable
     public void Write(NetworkWriter writer)
     {
         if (Platform == Platform.ModNation)
-        {
+        {   
+            int start = writer.Offset; //temp
             writer.Write(TrackName, 0x40);
             writer.Write(CreationId); // 0x40
             writer.Write(1); // - PlayerCount or something?
@@ -156,6 +157,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
         
             writer.Write(KartParkHome, 0x40); // 0x8c
             writer.Write(TranslatedTrackName, 0x40); // 0xcc
+            Logger.LogInfo<EventSettings>($"Writing NIS '{NisName}' at offset 0x{writer.Offset - start:X}"); // temporary 
             writer.Write(NisName, 0x40); // 0x10c - intro (NIS) name which the server picks and sends to the clients
 
             return;
