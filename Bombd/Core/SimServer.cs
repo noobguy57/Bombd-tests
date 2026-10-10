@@ -527,6 +527,14 @@ public class SimServer
         // long logging to find why xp races behave weird with their timer
         Logger.LogInfo<SimServer>($"GameroomState {oldState} -> {state}: start in {(room.LoadEventTime - TimeHelper.LocalTime) / 1000.0:0.0}s, timerLock={room.LockedTimerValue}, racerLock={room.LockedForRacerJoinsValue}, players={_players.Count}, ready={_players.Count(p => (p.State.Flags & PlayerStateFlags.GameRoomReady) != 0)}");
         _gameroomState.Sync();
+        
+        // trying to emulate original server's 6th state
+        if (state == RoomState.DownloadingTracks && IsModNation && _raceSettings != null)
+        {
+            AssignRandomNis(_raceSettings.Value);
+            TriggerRaceEventSync(EventUpdateReason.RaceStarting);
+        }
+    }
     }
     
     private GenericSyncObject<T> CreateSystemSyncObject<T>(T instance, NetObjectTypeInfo typeInfo) where T : INetworkWritable
