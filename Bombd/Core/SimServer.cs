@@ -805,6 +805,7 @@ public class SimServer
     private static void AssignRandomNis(EventSettings settings)
     {
         settings.NisName = OnlineNisNames[Random.Shared.Next(OnlineNisNames.Length)];
+        Logger.LogInfo<SimServer>($"Assigned intro {settings.NisName} for track {settings.CreationId}");
     }
     
     public void OnNetworkMessage(GamePlayer player, uint senderNameUid, NetMessageType type, ArraySegment<byte> data)
@@ -2029,7 +2030,6 @@ public class SimServer
                                     {
                                         AssignRandomNis(_raceSettings.Value);
                                         TriggerRaceEventSync(EventUpdateReason.RaceSettingsChanged);
-                                        Logger.LogInfo<SimServer>($"Assigned intro {settings.NisName} for track {settings.CreationId}");
                                     }
                                     
                                     // Tell spectators that we're connecting back into the lobby
