@@ -161,7 +161,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
             Logger.LogInfo<EventSettings>($"Writing NIS '{NisName}' at offset 0x{writer.Offset - start:X}, track {CreationId}, reason {UpdateReason}, ranked {IsRanked}");
             writer.Write(NisName, 0x38); // 0x10c - intro (NIS) name which the server picks and sends to the clients
             writer.Write(1);             // 0x144 this was always 1 in original server
-            writer.write(0);             // 0x148
+            writer.Write(0);             // 0x148
 
             return;
         }
