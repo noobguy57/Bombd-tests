@@ -2029,6 +2029,7 @@ public class SimServer
                                     {
                                         AssignRandomNis(_raceSettings.Value);
                                         TriggerRaceEventSync(EventUpdateReason.RaceSettingsChanged);
+                                        Logger.LogInfo<SimServer>($"Assigned intro {settings.NisName} for track {settings.CreationId}");
                                     }
                                     
                                     // Tell spectators that we're connecting back into the lobby
