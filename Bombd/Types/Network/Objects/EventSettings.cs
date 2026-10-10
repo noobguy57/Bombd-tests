@@ -103,7 +103,7 @@ public class EventSettings : INetworkReadable, INetworkWritable
             reader.Offset += 4;
             UpdateReason = (EventUpdateReason)reader.ReadInt32();
             KartParkHome = reader.ReadString(0x40);
-            TranslatedTrackName = reader.ReadString(0x80);
+            TranslatedTrackName = reader.ReadString(0x40);
             NisName = reader.ReadString(0x40); // intro (NIS) name
             
             return;
