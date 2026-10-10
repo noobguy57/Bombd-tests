@@ -535,7 +535,6 @@ public class SimServer
             TriggerRaceEventSync(EventUpdateReason.RaceStarting);
         }
     }
-    }
     
     private GenericSyncObject<T> CreateSystemSyncObject<T>(T instance, NetObjectTypeInfo typeInfo) where T : INetworkWritable
     {
